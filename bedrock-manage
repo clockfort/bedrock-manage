@@ -1,0 +1,116 @@
+#!/bin/bash
+
+# User Settings
+mc_dir="/home/clockfort/minecraft"
+mc_screen_name="minecraft_server"
+mc_logfile="$mc_dir/minecraft.log"
+mc_shutdown_timeout="15s"
+mc_backups_dir="/home/clockfort/minecraft_backups"
+
+cd "$mc_dir"
+mkdir -p $mc_backups_dir
+
+mc_pid=`pidof bedrock_server`
+mc_ret=$?
+mc_backup_name=`date +'mc_backup_%Y_%m_%d_%H_%M_%S'`
+
+
+start_mc_server () {
+	echo "Starting minecraft server. Logs will be written to $mc_logfile"
+	screen -dmS "$mc_screen_name" -L -Logfile "$mc_logfile" ./bedrock_server
+	local mc_newpid=`pidof bedrock_server`
+	local mc_newpid_ret=$?
+	if [ $mc_newpid_ret -ne 0 ]; then
+		echo "Error: Minecraft server failed to spawn."
+		exit 1
+	else
+		echo "Done, server started and running; new pid is $mc_newpid"
+	fi
+}
+
+backup_offline () {
+	local backup_fullpath="$mc_backups_dir/$mc_backup_name"
+	local tar_fullpath="$mc_backups_dir/$mc_backup_name.tar.gz"
+
+	echo "Performing an offline backup to $backup_fullpath ..."
+	
+	time cp -r "$mc_dir" "$backup_fullpath"
+
+	echo "Compressing..."
+	cd "$mc_backups_dir"
+	time tar czf "$mc_backup_name.tar.gz" "$mc_backup_name"
+	rm -fr "$mc_backup_name"
+	cd "$mc_dir"
+
+	echo "Done. Server was backed up to $tar_fullpath"
+}
+
+send_command_to_server_and_wait () {
+	# the prepended newline is in case operator left manual input on the console
+	screen -S "$mc_screen_name" -X stuff "\n$1\n"
+	sleep $2 # wait for logfile to flush
+}
+
+check_player_count () {
+	echo "Checking online player count..."
+	send_command_to_server_and_wait "list" 3s
+	local num_players=`grep "There are .* players online" "$mc_logfile" | tail -n 1 | grep -Eo 'are [0-9]{1,}' | grep -Eo '[0-9]{1,}'`
+	if [ $num_players -ne 0 ]; then
+		echo "Active player count is $num_players. Refusing to perform backup at this time."
+		exit 0
+	else
+		echo "There are no active players."
+	fi
+}
+
+stop_running_server () {
+	send_command_to_server_and_wait "stop" $mc_shutdown_timeout
+	mc_checkpid=`pidof bedrock_server`
+	mc_checkpid_ret=$?
+
+	if [ $mc_checkpid_ret -ne 0 ]; then
+		echo "Server at pid $mc_pid was shut down."
+	else
+		echo "Error: Server did not stop within timeout."
+		exit 1
+	fi
+
+	local exit_was_clean=`tail -n 1 $mc_logfile | grep -i "Quit correctly" | wc -l`
+	if [ $exit_was_clean -eq 1 ]; then
+		echo "Detected a clean shutdown and flush of the server."
+	else
+		echo "Error: Did not detect a clean shutdown and flush of the server. Please consult $mc_logfile for more information."
+		exit 1
+	fi
+}
+
+print_usage () {
+	echo "Possible commands are 'start', 'stop', and 'backup'"
+}
+
+if [ $1 = "start" ]; then
+	start_mc_server
+	exit 0
+fi
+
+if [ $1 = "stop" ]; then
+	stop_running_server
+	exit 0
+fi
+
+if [ $1 = "backup" ]; then
+	if [ $mc_ret -ne 0 ]; then
+		echo "Minecraft server is not online. Exiting out of caution."
+		exit 1
+	else
+		echo "Running Minecraft server found at pid $mc_pid"
+		check_player_count
+		stop_running_server
+		backup_offline
+		start_mc_server
+		exit 0
+	fi
+fi
+
+print_usage
+
