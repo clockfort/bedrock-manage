@@ -38,7 +38,7 @@ backup_offline () {
 
 	echo "Compressing..."
 	cd "$mc_backups_dir"
-	time tar czf "$mc_backup_name.tar.gz" "$mc_backup_name"
+	time tar czf "$mc_backup_name.tar.gz" --exclude='bedrock_server' --exclude='bedrock_server_symbols.debug' "$mc_backup_name"
 	rm -fr "$mc_backup_name"
 	cd "$mc_dir"
 
