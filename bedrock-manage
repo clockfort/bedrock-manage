@@ -64,6 +64,7 @@ check_player_count () {
 }
 
 stop_running_server () {
+	echo "Stopping running server..."
 	send_command_to_server_and_wait "stop" $mc_shutdown_timeout
 	mc_checkpid=`pidof bedrock_server`
 	mc_checkpid_ret=$?
