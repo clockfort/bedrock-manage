@@ -11,3 +11,4 @@
   - add map labels
     - add json transformer to dynamically generate multiple versions of the map markers, with and without labels?
     - make map labels github-editable by players
+    - add map label w/ checkmark for completed treasure chests
