@@ -23,7 +23,7 @@ fi
 mc_pid=`pidof bedrock_server`
 mc_ret=$?
 
-timestamp_iso8601=`date --iso-8601`
+timestamp_iso8601=`date --iso-8601=m`
 mc_backup_name=`date +'mc_backup_%Y_%m_%d_%H_%M_%S'`
 backup_fullpath="$mc_backups_dir/$mc_backup_name"
 
@@ -104,18 +104,18 @@ generate_maps () {
 	local max_err=0
 
 	echo "Generating overworld map..."
-	time "$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/overworld" \
-		--zoomout=4 --zoomin=4 --dimension overworld --background="#000000" -f --log-level="warning" &
+	time "$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output "$www_dir/overworld" \
+		--zoomout=4 --zoomin=4 --dimension overworld --background="#000000" --log-level="warning" &
 	pid_list="$pid_list $!"
 
 	echo "Generating nether map [upper slice]..."
 	"$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/nether" \
-		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 92 --gndxray="true" -f --log-level="warning" &
+		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 92 --gndxray="true" --log-level="warning" &
 	pid_list="$pid_list $!"
 
 	echo "Generating nether map [lower slice]..."
 	"$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/nether_lower" \
-		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 70 --gndxray="true" -f --log-level="warning" &
+		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 70 --gndxray="true" --log-level="warning" &
 	pid_list="$pid_list $!"
 
 	echo "Waiting for map generation sub-processes to return..."
@@ -127,6 +127,15 @@ generate_maps () {
 		echo "An error occured while generating maps. Exiting."
 		exit 1
 	fi
+	echo "Map generation complete."
+	generate_index_html
+}
+
+generate_index_html () {
+	echo "Generating HTML..."
+	cp "$mc_dir/www_templates/index.html.template" "$www_dir/index.html.temp"
+	sed -i "s/%TIMESTAMP%/$timestamp_iso8601/g" "$www_dir/index.html.temp"
+	mv "$www_dir/index.html.temp" "$www_dir/index.html"
 }
 
 print_usage () {
