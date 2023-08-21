@@ -49,10 +49,15 @@ backup_offline () {
 
 	echo "Compressing..."
 	cd "$mc_backups_dir"
-	time tar czf "$mc_backup_name.tar.gz" --exclude='bedrock_server' --exclude='bedrock_server_symbols.debug' "$mc_backup_name"
+	tar czf "$mc_backup_name.tar.gz" --exclude='bedrock_server' --exclude='bedrock_server_symbols.debug' "$mc_backup_name" &
+
 	if [ $mc_generate_maps = "true" ]; then
 		generate_maps
 	fi
+
+	# we're waiting both for tar to finish and the map gen's subprocesses, because the mapgen is using this dir
+	wait
+	echo "All subprocesses using the uncompressed backup dir have completed. Removing it."
 	rm -fr "$mc_backup_name"
 	cd "$mc_dir"
 
