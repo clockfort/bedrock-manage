@@ -8,22 +8,24 @@ mc_logfile="$mc_dir/minecraft.log"
 mc_shutdown_timeout="15s"
 mc_backups_dir="/home/clockfort/minecraft_backups"
 
-mc_generate_maps="false"
-mc_force_regenerate_maps="true"
-www_dir="/var/www/html"
+mc_generate_maps="true"
+www_dir="/home/clockfort/www/html"
 unmined_dir="/home/clockfort/unmined"
 
 
 # Computed Parameters
 cd "$mc_dir"
-mkdir -p $mc_backups_dir
+mkdir -p "$mc_backups_dir"
+if [ $mc_generate_maps = "true" ]; then
+	mkdir -p "$www_dir"
+fi
 
 mc_pid=`pidof bedrock_server`
 mc_ret=$?
 
 timestamp_iso8601=`date --iso-8601`
 mc_backup_name=`date +'mc_backup_%Y_%m_%d_%H_%M_%S'`
-backup_fullpath="$mc_backups_dir/mc_backup_name"
+backup_fullpath="$mc_backups_dir/$mc_backup_name"
 
 start_mc_server () {
 	echo "Starting minecraft server. Logs will be written to $mc_logfile"
@@ -98,13 +100,6 @@ stop_running_server () {
 }
 
 generate_maps () {
-	if [ $mc_force_regenerate_maps = "true" ]; then
-		echo "Removing existing maps data..."
-		rm -r "$www_dir/overworld"
-		rm -r "$www_dir/nether"
-		rm -r "$www_dir/nether_lower"
-	fi
-
 	local pid_list=""
 	local max_err=0
 
@@ -113,14 +108,14 @@ generate_maps () {
 		--zoomout=4 --zoomin=4 --dimension overworld --background="#000000" -f --log-level="warning" &
 	pid_list="$pid_list $!"
 
-	echo "Generasting nether map [upper slice]..."
+	echo "Generating nether map [upper slice]..."
 	"$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/nether" \
-		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 92 --gndxray -f --log-level="warning" &
+		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 92 --gndxray="true" -f --log-level="warning" &
 	pid_list="$pid_list $!"
 
 	echo "Generating nether map [lower slice]..."
 	"$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/nether_lower" \
-		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 70 --gndxray -f --log-level="warning" &
+		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 70 --gndxray="true" -f --log-level="warning" &
 	pid_list="$pid_list $!"
 
 	echo "Waiting for map generation sub-processes to return..."
