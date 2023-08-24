@@ -123,6 +123,8 @@ generate_maps () {
 		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 70 --gndxray="true" --log-level="warning" &
 	pid_list="$pid_list $!"
 
+	generate_index_html
+
 	echo "Waiting for map generation sub-processes to return..."
 	for pid in $pid_list; do
 		wait $pid || let "max_err=1"
@@ -133,7 +135,6 @@ generate_maps () {
 		exit 1
 	fi
 	echo "Map generation complete."
-	generate_index_html
 }
 
 generate_index_html () {
