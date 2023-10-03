@@ -51,7 +51,7 @@ backup_offline () {
 
 	echo "Compressing..."
 	cd "$mc_backups_dir"
-	tar czf "$mc_backup_name.tar.gz" --exclude='bedrock_server' --exclude='bedrock_server_symbols.debug' "$mc_backup_name" &
+	tar czf "$mc_backup_name.tar.gz" --exclude='bedrock_server' --exclude='bedrock_server_symbols.debug' --exclude "behavior_packs" --exclude "resource_packs" --exclude ".git" "$mc_backup_name" &
 
 	if [ $mc_generate_maps = "true" ]; then
 		generate_maps
