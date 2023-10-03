@@ -7,6 +7,8 @@ mc_world_name="morr"
 mc_logfile="$mc_dir/minecraft.log"
 mc_shutdown_timeout="15s"
 mc_backups_dir="/home/clockfort/minecraft_backups"
+mc_windows_dir="/home/clockfort/windows"
+scratch_dir="/home/clockfort/scratch"
 
 mc_generate_maps="true"
 www_dir="/home/clockfort/www/html"
@@ -72,7 +74,7 @@ send_command_to_server_and_wait () {
 
 check_player_count () {
 	echo "Checking online player count..."
-	send_command_to_server_and_wait "list" 8s
+	send_command_to_server_and_wait "list" 15s
 	local num_players=`grep "There are .* players online" "$mc_logfile" | tail -n 1 | grep -Eo 'are [0-9]{1,}' | grep -Eo '[0-9]{1,}'`
 	if [ $num_players -ne 0 ]; then
 		echo "Active player count is $num_players."
@@ -115,7 +117,7 @@ generate_maps () {
 
 	echo "Generating nether map [upper slice]..."
 	"$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/nether" \
-		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 92 --gndxray="true" --log-level="warning" &
+		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 126 --gndxray="true" --log-level="warning" &
 	pid_list="$pid_list $!"
 
 	echo "Generating nether map [lower slice]..."
@@ -144,8 +146,38 @@ generate_index_html () {
 	mv "$www_dir/index.html.temp" "$www_dir/index.html"
 }
 
+get_running_status () {
+	if [ $mc_ret -ne 0 ]; then
+		echo "Minecraft server is not running."
+		return 0
+	else
+		echo "Running Minecraft server found at pid $mc_pid"
+		check_player_count
+		return 1
+        fi
+}
+
+abort_with_err_if_running () {
+	get_running_status
+	local status = "$?"
+	if [ $status = 1 ]; then
+		echo "Refusing to run due to an active server."
+		exit 1
+	fi
+}
+
+export_and_lock () {
+	abort_with_err_if_running
+	echo "not implemented"
+}
+
+import_and_unlock () {
+	abort_with_err_if_running
+	echo "not implemented"
+}
+
 print_usage () {
-	echo "Possible commands are 'start', 'stop', 'status', and 'backup'"
+	echo "Possible commands are 'start', 'stop', 'status', 'backup', 'export', 'import'"
 }
 
 if [ $1 = "start" ]; then
@@ -159,17 +191,9 @@ if [ $1 = "stop" ]; then
 fi
 
 if [ $1 = "status" ]; then
-	if [ $mc_ret -ne 0 ]; then
-		echo "Minecraft server is not running."
-		exit 0
-	else
-		echo "Running Minecraft server found at pid $mc_pid"
-		check_player_count
-		exit 0
-
-	fi
+	get_running_status
+	exit 0
 fi
-
 
 if [ $1 = "backup" ]; then
 	if [ $mc_ret -ne 0 ]; then
@@ -183,6 +207,16 @@ if [ $1 = "backup" ]; then
 		start_mc_server
 		exit 0
 	fi
+fi
+
+if [ $1 = "export" ]; then
+	export_and_lock
+	exit 0
+fi
+
+if [ $1 = "import" ]; then
+	import_and_unlock
+	exit 0
 fi
 
 print_usage
