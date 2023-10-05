@@ -29,9 +29,15 @@ timestamp_iso8601=`date --iso-8601=m`
 mc_backup_name=`date +'mc_backup_%Y_%m_%d_%H_%M_%S'`
 backup_fullpath="$mc_backups_dir/$mc_backup_name"
 
+warm_cache () {
+	echo "Warming LevelDB cache..."
+	vmtouch -t "$mc_dir/worlds/$mc_world_name"
+}
+
 start_mc_server () {
 	echo "Starting minecraft server. Logs will be written to $mc_logfile"
 	screen -dmS "$mc_screen_name" -L -Logfile "$mc_logfile" ./bedrock_server
+	sleep 1
 	local mc_newpid=`pidof bedrock_server`
 	local mc_newpid_ret=$?
 	if [ $mc_newpid_ret -ne 0 ]; then
@@ -40,6 +46,7 @@ start_mc_server () {
 	else
 		echo "Done, server started and running; new pid is $mc_newpid"
 	fi
+	warm_cache
 }
 
 backup_offline () {
