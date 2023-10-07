@@ -132,6 +132,10 @@ generate_maps () {
 		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 70 --gndxray="true" --log-level="warning" &
 	pid_list="$pid_list $!"
 
+	echo "Generating end map..."
+	"$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/end" \
+		--zoomout=4 --zoomin=4 --dimension end --background="#000000" &
+
 	generate_index_html
 
 	echo "Waiting for map generation sub-processes to return..."
