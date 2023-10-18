@@ -79,12 +79,17 @@ send_command_to_server_and_wait () {
 	sleep $2 # wait for logfile to flush
 }
 
+say () {
+	screen -S "$mc_screen_name" -X stuff "\nsay $1\n"
+}
+
 check_player_count () {
 	echo "Checking online player count..."
 	send_command_to_server_and_wait "list" 15s
 	local num_players=`grep "There are .* players online" "$mc_logfile" | tail -n 1 | grep -Eo 'are [0-9]{1,}' | grep -Eo '[0-9]{1,}'`
 	if [ $num_players -ne 0 ]; then
 		echo "Active player count is $num_players."
+		say "$num_players player(s) online, so backup was not performed. Will try again later."
 		exit 0
 	else
 		echo "There are no active players."
