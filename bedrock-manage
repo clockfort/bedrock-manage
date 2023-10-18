@@ -220,8 +220,20 @@ if [ $1 = "backup" ]; then
 	fi
 fi
 
+if [ $1 = "fast-backup" ]; then
+	mc_generate_maps="false"
+	stop_running_server
+	backup_offline
+	start_mc_server
+	exit 0
+fi
+
 if [ $1 = "export" ]; then
-	export_and_lock
+        mc_generate_maps="false"
+        stop_running_server
+        backup_offline
+
+	#export_and_lock
 	exit 0
 fi
 
