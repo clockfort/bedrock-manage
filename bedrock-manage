@@ -14,6 +14,7 @@ mc_generate_maps="true"
 www_dir="/home/clockfort/www/html"
 unmined_dir="/home/clockfort/unmined"
 
+stop_file="/home/clockfort/disable_backups"
 
 # Computed Parameters
 cd "$mc_dir"
@@ -212,6 +213,11 @@ if [ $1 = "status" ]; then
 fi
 
 if [ $1 = "backup" ]; then
+	if test -f "$stop_file"; then
+		echo "The maintenance stop file $stop_file exists. Exiting without doing anything."
+		exit 0
+	fi
+
 	if [ $mc_ret -ne 0 ]; then
 		echo "Minecraft server is not online. Exiting out of caution."
 		exit 1
