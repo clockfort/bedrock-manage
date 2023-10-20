@@ -37,7 +37,7 @@ warm_cache () {
 
 start_mc_server () {
 	echo "Starting minecraft server. Logs will be written to $mc_logfile"
-	screen -dmS "$mc_screen_name" -L -Logfile "$mc_logfile" ./bedrock_server
+	LD_LIBRARY_PATH="$mc_dir" screen -dmS "$mc_screen_name" -L -Logfile "$mc_logfile" ./bedrock_server
 	sleep 1
 	local mc_newpid=`pidof bedrock_server`
 	local mc_newpid_ret=$?
