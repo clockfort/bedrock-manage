@@ -51,7 +51,7 @@ start_mc_server () {
 }
 
 backup_offline () {
-	local tar_fullpath="$mc_backups_dir/$mc_backup_name.tar.gz"
+	local tar_fullpath="$mc_backups_dir/$mc_backup_name.tar"
 
 	echo "Performing an offline backup to $backup_fullpath ..."
 	
@@ -59,7 +59,13 @@ backup_offline () {
 
 	echo "Compressing..."
 	cd "$mc_backups_dir"
-	tar czf "$mc_backup_name.tar.gz" --exclude='bedrock_server' --exclude='bedrock_server_symbols.debug' --exclude "behavior_packs" --exclude "resource_packs" --exclude ".git" "$mc_backup_name" &
+	time tar cf \
+		"$mc_backup_name.tar" \
+		"$mc_backup_name/allowlist.json" \
+		"$mc_backup_name/server.properties" \
+		"$mc_backup_name/minecraft.log" \
+		"$mc_backup_name/www_templates/" \
+		"$mc_backup_name/worlds" &
 
 	if [ $mc_generate_maps = "true" ]; then
 		generate_maps
