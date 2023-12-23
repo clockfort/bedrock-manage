@@ -14,6 +14,8 @@ mc_generate_maps="true"
 www_dir="/home/clockfort/www/html"
 unmined_dir="/home/clockfort/unmined"
 
+library_dir="/home/clockfort/library"
+
 stop_file="/home/clockfort/disable_backups"
 
 # Computed Parameters
@@ -65,7 +67,9 @@ backup_offline () {
 		"$mc_backup_name/server.properties" \
 		"$mc_backup_name/minecraft.log" \
 		"$mc_backup_name/www_templates/" \
-		"$mc_backup_name/worlds" &
+		"$mc_backup_name/worlds"
+
+	generate_library
 
 	if [ $mc_generate_maps = "true" ]; then
 		generate_maps
@@ -131,7 +135,7 @@ generate_maps () {
 
 	echo "Generating overworld map..."
 	time "$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output "$www_dir/overworld" \
-		--zoomout=4 --zoomin=4 --dimension overworld --background="#000000" --log-level="warning" &
+		--zoomout=7 --zoomin=4 --dimension overworld --background="#000000" --log-level="warning" &
 	pid_list="$pid_list $!"
 
 	echo "Generating nether map [upper slice]..."
@@ -201,6 +205,12 @@ import_and_unlock () {
 
 print_usage () {
 	echo "Possible commands are 'start', 'stop', 'status', 'backup', 'export', 'import'"
+}
+
+generate_library () {
+	echo "Generating library..."
+	time python3 "$library_dir/import.py" "$backup_fullpath" "$mc_world_name"
+	cp "$backup_fullpath/books.txt" "$www_dir/library/"
 }
 
 if [ $1 = "start" ]; then
