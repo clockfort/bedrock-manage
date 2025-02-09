@@ -135,29 +135,29 @@ generate_maps () {
 
 	echo "Generating overworld map..."
 	time "$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output "$www_dir/overworld" \
-		--zoomout=7 --zoomin=4 --dimension overworld --background="#000000" --log-level="warning" &
+		--zoomout=7 --zoomin=4 --dimension overworld --background="#000000" --log-level="warning" -c --imageformat="webp" --chunkprocessors=2 &
 	pid_list="$pid_list $!"
 
 
         echo "Generating overworld biome map..."
         time "$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output "$www_dir/overworld_biome" \
-                --zoomout=7 --zoomin=4 --dimension overworld --background="#000000" --log-level="warning" --mapsettings "$unmined_dir/custom/biomes_only.json" &
+                --zoomout=7 --zoomin=4 --dimension overworld --background="#000000" --log-level="warning" -c --imageformat="webp" --mapsettings "$unmined_dir/custom/biomes_only.json" --chunkprocessors=2 &
         pid_list="$pid_list $!"
 
 
 	echo "Generating nether map [upper slice]..."
 	"$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/nether" \
-		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 126 --gndxray="true" --log-level="warning" &
+		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 126 --gndxray="true" --log-level="warning" -c --imageformat="webp" --chunkprocessors=2 &
 	pid_list="$pid_list $!"
 
 	echo "Generating nether map [lower slice]..."
 	"$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/nether_lower" \
-		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 70 --gndxray="true" --log-level="warning" &
+		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 70 --gndxray="true" --log-level="warning" -c --imageformat="webp" --chunkprocessors=2 &
 	pid_list="$pid_list $!"
 
 	echo "Generating end map..."
 	"$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/end" \
-		--zoomout=4 --zoomin=4 --dimension end --background="#000000" &
+		--zoomout=4 --zoomin=4 --dimension end --background="#000000" -c --imageformat="webp" &
 
 	generate_index_html
 
@@ -216,7 +216,9 @@ print_usage () {
 
 generate_library () {
 	echo "Generating library..."
+	source "$library_dir/.venv/bin/activate"
 	time python3 "$library_dir/import.py" "$backup_fullpath" "$mc_world_name"
+	deactivate
 	cp "$backup_fullpath/books.txt" "$www_dir/library/"
 }
 
