@@ -134,30 +134,37 @@ generate_maps () {
 	local max_err=0
 
 	echo "Generating overworld map..."
-	time "$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output "$www_dir/overworld" \
-		--zoomout=7 --zoomin=4 --dimension overworld --background="#000000" --log-level="warning" -c --imageformat="webp" --chunkprocessors=2 &
+	time "$unmined_dir/unmined-cli" web render --players --world="$backup_fullpath/worlds/$mc_world_name" --output "$www_dir/overworld" \
+		--zoomout=7 --zoomin=4 --dimension overworld --background="#000000" --log-level="warning" -c --imageformat="webp" --chunkprocessors=4 &
 	pid_list="$pid_list $!"
 
 
         echo "Generating overworld biome map..."
         time "$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output "$www_dir/overworld_biome" \
-                --zoomout=7 --zoomin=4 --dimension overworld --background="#000000" --log-level="warning" -c --imageformat="webp" --mapsettings "$unmined_dir/custom/biomes_only.json" --chunkprocessors=2 &
+                --zoomout=7 --zoomin=4 --dimension overworld --background="#000000" --log-level="warning" -c --imageformat="webp" \
+		--mapsettings "$unmined_dir/custom/biomes_only.json" --chunkprocessors=4 &
         pid_list="$pid_list $!"
 
+	echo "Generating overworld shadow map..."
+	time "$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output "$www_dir/overworld_shadow" \
+                --zoomout=7 --zoomin=4 --dimension overworld --background="#000000" --log-level="warning" -c --imageformat="webp" \
+		--chunkprocessors=4 --shadows="3d" &
+	pid_list="$pid_list $1"
 
 	echo "Generating nether map [upper slice]..."
-	"$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/nether" \
+	"$unmined_dir/unmined-cli" web render --players --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/nether" \
 		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 126 --gndxray="true" --log-level="warning" -c --imageformat="webp" --chunkprocessors=2 &
 	pid_list="$pid_list $!"
 
 	echo "Generating nether map [lower slice]..."
-	"$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/nether_lower" \
+	"$unmined_dir/unmined-cli" web render --players --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/nether_lower" \
 		--zoomout=4 --zoomin=4 --dimension nether --background="#000000" --topY 70 --gndxray="true" --log-level="warning" -c --imageformat="webp" --chunkprocessors=2 &
 	pid_list="$pid_list $!"
 
 	echo "Generating end map..."
-	"$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/end" \
-		--zoomout=4 --zoomin=4 --dimension end --background="#000000" -c --imageformat="webp" &
+	"$unmined_dir/unmined-cli" web render --players --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/end" \
+		--zoomout=4 --zoomin=4 --dimension end --background="#000000" -c --log-level="warning" --imageformat="webp" &
+	pid_list="$pid_list $!"
 
 	generate_index_html
 
