@@ -1,0 +1,5 @@
+#!/bin/bash
+screen -S minecraft_server -X stuff 'tickingarea remove cows'`echo -ne '\015'`
+screen -S minecraft_server -X stuff 'say There is no cow level! (ticking area removed)'`echo -ne '\015'`
+screen -S minecraft_server -X stuff 'tickingarea remove sheep'`echo -ne '\015'`
+screen -S minecraft_server -X stuff 'say black sheep wall (ticking area removed)'`echo -ne '\015'`
