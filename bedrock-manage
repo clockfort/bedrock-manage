@@ -69,7 +69,7 @@ backup_offline () {
 		"$mc_backup_name/www_templates/" \
 		"$mc_backup_name/worlds"
 
-	generate_library
+	generate_library &
 
 	if [ $mc_generate_maps = "true" ]; then
 		generate_maps
