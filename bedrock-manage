@@ -67,8 +67,9 @@ backup_offline () {
 		"$mc_backup_name/server.properties" \
 		"$mc_backup_name/minecraft.log" \
 		"$mc_backup_name/www_templates/" \
-		"$mc_backup_name/worlds"
+		"$mc_backup_name/worlds" &
 
+	time (cd "$mc_backup_name/worlds/$mc_world_name" && zip -0 -qr "$mc_backups_dir/most_recent.mcworld" ./*) &
 	generate_library &
 
 	if [ $mc_generate_maps = "true" ]; then
