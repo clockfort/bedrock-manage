@@ -159,7 +159,7 @@ generate_maps () {
 
 	echo "Generating end map..."
 	"$unmined_dir/unmined-cli" web render --players --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/end" \
-		--zoomout=4 --zoomin=6 --dimension end --background="#000000" -c --log-level="warning" --imageformat="webp" &
+		--zoomout=4 --zoomin=5 --dimension end --background="#000000" -c --log-level="warning" --imageformat="webp" &
 	pid_list="$pid_list $!"
 
 	generate_index_html
@@ -219,9 +219,7 @@ print_usage () {
 
 generate_library () {
 	echo "Generating library..."
-	source "$library_dir/.venv/bin/activate"
-	time python3 "$library_dir/import.py" "$backup_fullpath" "$mc_world_name"
-	deactivate
+	time uv run --project "$library_dir" "$library_dir/import.py" "$backup_fullpath" "$mc_world_name"
 	cp "$backup_fullpath/books.txt" "$www_dir/library/"
 }
 
