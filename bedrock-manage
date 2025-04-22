@@ -16,6 +16,8 @@ unmined_dir="/home/clockfort/unmined"
 
 library_dir="/home/clockfort/library"
 
+www_template_dir="/home/clockfort/www_templates"
+
 stop_file="/home/clockfort/disable_backups"
 
 # Computed Parameters
@@ -179,7 +181,7 @@ generate_maps () {
 
 generate_index_html () {
 	echo "Generating HTML..."
-	cp "$mc_dir/www_templates/index.html.template" "$www_dir/index.html.temp"
+	cp "$www_template_dir/index.html.template" "$www_dir/index.html.temp"
 	sed -i "s/%TIMESTAMP%/$timestamp_iso8601/g" "$www_dir/index.html.temp"
 	mv "$www_dir/index.html.temp" "$www_dir/index.html"
 }
