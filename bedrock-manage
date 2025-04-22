@@ -61,7 +61,7 @@ backup_offline () {
 	
 	time cp -r "$mc_dir" "$backup_fullpath"
 
-	echo "Compressing..."
+	echo "Generating full tarfile..."
 	cd "$mc_backups_dir"
 	time tar cf \
 		"$mc_backup_name.tar" \
@@ -71,7 +71,10 @@ backup_offline () {
 		"$mc_backup_name/www_templates/" \
 		"$mc_backup_name/worlds" &
 
+	echo "Generating most recent .mcworld importable file..."
 	time (cd "$mc_backup_name/worlds/$mc_world_name" && zip -0 -qr "$mc_backups_dir/most_recent.mcworld" ./*) &
+	wait # generate_library mounting the db can cause leveldb compactions etc, let's lock in a stable state
+
 	generate_library &
 
 	if [ $mc_generate_maps = "true" ]; then
