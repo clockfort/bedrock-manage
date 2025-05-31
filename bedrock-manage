@@ -72,6 +72,7 @@ backup_offline () {
 		"$mc_backup_name/worlds" &
 
 	echo "Generating most recent .mcworld importable file..."
+	rm "$mc_backups_dir/most_recent.mcworld"
 	time (cd "$mc_backup_name/worlds/$mc_world_name" && zip -0 -qr "$mc_backups_dir/most_recent.mcworld" ./*) &
 	wait # generate_library mounting the db can cause leveldb compactions etc, let's lock in a stable state
 
@@ -81,7 +82,6 @@ backup_offline () {
 		generate_maps
 	fi
 
-	# we're waiting both for tar to finish and the map gen's subprocesses, because the mapgen is using this dir
 	wait
 	echo "All subprocesses using the uncompressed backup dir have completed. Removing it."
 	rm -fr "$mc_backup_name"
