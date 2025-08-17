@@ -1,0 +1,3 @@
+#!/bin/bash
+screen -S minecraft_server -X stuff 'tickingarea add -1376 0 2336 -134 0 2383 cubo'`echo -ne '\015'`
+screen -S minecraft_server -X stuff 'say Cigars and Picasso are in (ticking area added)'`echo -ne '\015'`
