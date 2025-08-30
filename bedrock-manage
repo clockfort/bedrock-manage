@@ -5,7 +5,7 @@ mc_dir="/home/clockfort/minecraft"
 mc_screen_name="minecraft_server"
 mc_world_name="morr"
 mc_logfile="$mc_dir/minecraft.log"
-mc_shutdown_timeout="10s"
+mc_shutdown_timeout="8s"
 mc_backups_dir="/home/clockfort/minecraft_backups"
 mc_windows_dir="/home/clockfort/windows"
 scratch_dir="/home/clockfort/scratch"
@@ -102,7 +102,7 @@ say () {
 
 check_player_count () {
 	echo "Checking online player count..."
-	send_command_to_server_and_wait "list" 5s
+	send_command_to_server_and_wait "list" 2s
 	local num_players=`grep "There are .* players online" "$mc_logfile" | tail -n 1 | grep -Eo 'are [0-9]{1,}' | grep -Eo '[0-9]{1,}'`
 	if [ $num_players -ne 0 ]; then
 		echo "Active player count is $num_players."
