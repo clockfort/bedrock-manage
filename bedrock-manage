@@ -76,7 +76,7 @@ backup_offline () {
 	time (cd "$mc_backup_name/worlds/$mc_world_name" && zip -0 -qr "$mc_backups_dir/most_recent.mcworld" ./*) &
 	wait # generate_library mounting the db can cause leveldb compactions etc, let's lock in a stable state
 
-	generate_library &
+	# generate_library &
 
 	if [ $mc_generate_maps = "true" ]; then
 		generate_maps
@@ -139,38 +139,168 @@ generate_maps () {
 	local pid_list=""
 	local max_err=0
 
-	echo "Generating overworld map..."
-	time "$unmined_dir/unmined-cli" web render --players --world="$backup_fullpath/worlds/$mc_world_name" --output "$www_dir/overworld" \
-		--zoomout=7 --zoomin=5 --dimension overworld --background="#000000" --log-level="warning" -c --imageformat="webp" \
+        echo "Generating overworld map..."
+        time "$unmined_dir/unmined-cli" web render \
+                --players \
+                --world="$backup_fullpath/worlds/$mc_world_name" \
+                --output "$www_dir/overworld" \
+                --zoomout=7 \
+                --zoomin=5 \
+                --dimension overworld \
+                --background="#000000" \
+                --log-level="warning" \
+                -c \
+                --imageformat="webp" \
+                --chunkprocessors=8 \
+                --shadows="3d" &
+        pid_list="$pid_list $!"
+
+	echo "Generating overworld map with textures..."
+	time "$unmined_dir/unmined-cli" web render \
+		--players \
+		--world="$backup_fullpath/worlds/$mc_world_name" \
+		--output "$www_dir/overworld_texture" \
+		--zoomout=7 \
+		--zoomin=5 \
+		--dimension overworld \
+		--background="#000000" \
+		--log-level="warning" \
+		-c \
+		--imageformat="webp" \
+		--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.10.4-full.zip" \
+		--textures=true \
+		--chunkprocessors=8 \
 		--shadows="3d" &
 	pid_list="$pid_list $!"
 
 
         echo "Generating overworld biome map..."
-        "$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output "$www_dir/overworld_biome" \
-                --zoomout=7 --zoomin=4 --dimension overworld --background="#000000" --log-level="warning" -c --imageformat="webp" \
+        "$unmined_dir/unmined-cli" web render \
+		--world="$backup_fullpath/worlds/$mc_world_name" \
+		--output "$www_dir/overworld_biome" \
+                --zoomout=7 \
+		--zoomin=4 \
+		--dimension overworld \
+		--background="#000000" \
+		--log-level="warning" \
+		-c \
+		--imageformat="webp" \
 		--mapsettings "$unmined_dir/custom/biomes_only.json" \
 		2>&1 > /dev/null & # ignore errors, playerbuilt structures log errors since they're not from a biome
         pid_list="$pid_list $!"
 
 	echo "Generating nether map [upper slice]..."
-	"$unmined_dir/unmined-cli" web render --players --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/nether" \
-		--zoomout=4 --zoomin=5 --dimension nether --background="#000000" --topY 126 --gndxray="true" --log-level="warning" -c --imageformat="webp" &
+	"$unmined_dir/unmined-cli" web render \
+		--players \
+		--world="$backup_fullpath/worlds/$mc_world_name" \
+		--output="$www_dir/nether_upper" \
+		--zoomout=4 \
+		--zoomin=5 \
+		--dimension nether \
+		--background="#000000" \
+		--topY 126 \
+		--gndxray="true" \
+		--log-level="warning" \
+		-c \
+		--imageformat="webp" &
 	pid_list="$pid_list $!"
+
+        echo "Generating nether map [upper slice texture]..."
+        "$unmined_dir/unmined-cli" web render \
+                --players \
+                --world="$backup_fullpath/worlds/$mc_world_name" \
+                --output="$www_dir/nether_upper_texture" \
+                --zoomout=4 \
+                --zoomin=5 \
+                --dimension nether \
+                --background="#000000" \
+                --topY 126 \
+                --gndxray="true" \
+                --log-level="warning" \
+                -c \
+                --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.10.4-full.zip" \
+                --textures=true \
+		--chunkprocessors=8 \
+                --imageformat="webp" &
+        pid_list="$pid_list $!"
 
 	echo "Generating nether map [lower slice]..."
-	"$unmined_dir/unmined-cli" web render --players --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/nether_lower" \
-		--zoomout=4 --zoomin=5 --dimension nether --background="#000000" --topY 70 --gndxray="true" --log-level="warning" -c --imageformat="webp" &
+	"$unmined_dir/unmined-cli" web render \
+		--players \
+		--world="$backup_fullpath/worlds/$mc_world_name" \
+		--output="$www_dir/nether_lower" \
+		--zoomout=4 \
+		--zoomin=5 \
+		--dimension nether \
+		--background="#000000" \
+		--topY 70 \
+		--gndxray="true" \
+		--log-level="warning" \
+		-c \
+		--imageformat="webp" &
 	pid_list="$pid_list $!"
+
+        echo "Generating nether map [lower slice texture]..."
+        "$unmined_dir/unmined-cli" web render \
+                --players \
+                --world="$backup_fullpath/worlds/$mc_world_name" \
+                --output="$www_dir/nether_lower_texture" \
+                --zoomout=4 \
+                --zoomin=5 \
+                --dimension nether \
+                --background="#000000" \
+                --topY 70 \
+                --gndxray="true" \
+                --log-level="warning" \
+                -c \
+                --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.10.4-full.zip" \
+                --textures=true \
+		--chunkprocessors=8 \
+                --imageformat="webp" &
+        pid_list="$pid_list $!"
 
 	echo "Generating end map..."
-	"$unmined_dir/unmined-cli" web render --players --world="$backup_fullpath/worlds/$mc_world_name" --output="$www_dir/end" \
-		--zoomout=4 --zoomin=5 --dimension end --background="#000000" -c --log-level="warning" --imageformat="webp" &
+	"$unmined_dir/unmined-cli" web render \
+		--players \
+		--world="$backup_fullpath/worlds/$mc_world_name" \
+		--output="$www_dir/end" \
+		--zoomout=4 \
+		--zoomin=5 \
+		--dimension end \
+		--background="#000000" \
+		-c \
+		--log-level="warning" \
+		--imageformat="webp" &
 	pid_list="$pid_list $!"
 
+        echo "Generating end map [textured]..."
+        "$unmined_dir/unmined-cli" web render \
+                --players \
+                --world="$backup_fullpath/worlds/$mc_world_name" \
+                --output="$www_dir/end_texture" \
+                --zoomout=4 \
+                --zoomin=5 \
+                --dimension end \
+                --background="#000000" \
+                -c \
+                --log-level="warning" \
+                --imageformat="webp" \
+                --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.10.4-full.zip" \
+                --textures=true \
+                --chunkprocessors=8 &
+        pid_list="$pid_list $!"
+
 	echo "Generating nether biome map..."
-	"$unmined_dir/unmined-cli" web render --world="$backup_fullpath/worlds/$mc_world_name" --output "$www_dir/nether_biome" \
-                --zoomout=4 --zoomin=5 --dimension nether --background="#000000" --log-level="warning" -c --imageformat="webp" \
+	"$unmined_dir/unmined-cli" web render \
+		--world="$backup_fullpath/worlds/$mc_world_name" \
+		--output "$www_dir/nether_biome" \
+                --zoomout=4 \
+		--zoomin=5 \
+		--dimension nether \
+		--background="#000000" \
+		--log-level="warning" \
+		-c \
+		--imageformat="webp" \
                 --mapsettings "$unmined_dir/custom/biomes_only.json" \
                 2>&1 > /dev/null & # ignore errors, playerbuilt structures log errors since they're not from a biome
         pid_list="$pid_list $!"
