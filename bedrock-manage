@@ -123,6 +123,8 @@ stop_running_server () {
 		echo "Server at pid $mc_pid was shut down."
 	else
 		echo "Error: Server did not stop within timeout."
+		echo "Stacktrace:"
+		cat /proc/pid/task/$mc_pid/stack
 		exit 1
 	fi
 
