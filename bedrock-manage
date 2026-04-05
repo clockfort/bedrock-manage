@@ -190,7 +190,7 @@ generate_maps () {
                 -c \
                 --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.10.4-full.zip" \
                 --textures=true \
-		--chunkprocessors=8 \
+                --chunkprocessors=8 \
                 --imageformat="webp" &
         pid_list="$pid_list $!"
 
@@ -209,7 +209,7 @@ generate_maps () {
                 -c \
                 --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.10.4-full.zip" \
                 --textures=true \
-		--chunkprocessors=8 \
+                --chunkprocessors=8 \
                 --imageformat="webp" &
         pid_list="$pid_list $!"
 
