@@ -147,15 +147,14 @@ generate_maps () {
 		--world="$backup_fullpath/worlds/$mc_world_name" \
 		--output "$www_dir/overworld_texture" \
 		--zoomout=7 \
-		--zoomin=5 \
+		--zoomin=6 \
 		--dimension overworld \
 		--background="#000000" \
 		--log-level="warning" \
 		-c \
 		--imageformat="webp" \
-		--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.10.4-full.zip" \
-		--textures=true \
-		--chunkprocessors=8 \
+		--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
+		--chunkprocessors=32 \
 		--shadows="3d" &
 	pid_list="$pid_list $!"
 
@@ -188,8 +187,7 @@ generate_maps () {
                 --gndxray="true" \
                 --log-level="warning" \
                 -c \
-                --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.10.4-full.zip" \
-                --textures=true \
+                --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
                 --chunkprocessors=8 \
                 --imageformat="webp" &
         pid_list="$pid_list $!"
@@ -207,8 +205,7 @@ generate_maps () {
                 --gndxray="true" \
                 --log-level="warning" \
                 -c \
-                --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.10.4-full.zip" \
-                --textures=true \
+                --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
                 --chunkprocessors=8 \
                 --imageformat="webp" &
         pid_list="$pid_list $!"
@@ -225,8 +222,7 @@ generate_maps () {
                 -c \
                 --log-level="warning" \
                 --imageformat="webp" \
-                --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.10.4-full.zip" \
-                --textures=true \
+                --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
                 --chunkprocessors=8 &
         pid_list="$pid_list $!"
 
