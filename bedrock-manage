@@ -154,12 +154,14 @@ generate_maps () {
 		-c \
 		--imageformat="webp" \
 		--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
+        --java-client-jar="$unmined_dir/custom/client.jar" \
+        --blockrender=true \
 		--chunkprocessors=32 \
 		--shadows="3d" &
 	pid_list="$pid_list $!"
 
 
-        echo "Generating overworld biome map..."
+	echo "Generating overworld biome map..."
         "$unmined_dir/unmined-cli" web render \
 		--world="$backup_fullpath/worlds/$mc_world_name" \
 		--output "$www_dir/overworld_biome" \
@@ -174,7 +176,7 @@ generate_maps () {
 		2>&1 > /dev/null & # ignore errors, playerbuilt structures log errors since they're not from a biome
         pid_list="$pid_list $!"
 
-        echo "Generating nether map [upper slice texture]..."
+	echo "Generating nether map [upper slice texture]..."
         "$unmined_dir/unmined-cli" web render \
                 --players \
                 --world="$backup_fullpath/worlds/$mc_world_name" \
@@ -187,12 +189,14 @@ generate_maps () {
                 --gndxray="true" \
                 --log-level="warning" \
                 -c \
-                --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
+				--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
+		        --java-client-jar="$unmined_dir/custom/client.jar" \
+		        --blockrender=true \
                 --chunkprocessors=8 \
                 --imageformat="webp" &
         pid_list="$pid_list $!"
 
-        echo "Generating nether map [lower slice texture]..."
+	echo "Generating nether map [lower slice texture]..."
         "$unmined_dir/unmined-cli" web render \
                 --players \
                 --world="$backup_fullpath/worlds/$mc_world_name" \
@@ -205,12 +209,14 @@ generate_maps () {
                 --gndxray="true" \
                 --log-level="warning" \
                 -c \
-                --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
+				--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
+		        --java-client-jar="$unmined_dir/custom/client.jar" \
+		        --blockrender=true \
                 --chunkprocessors=8 \
                 --imageformat="webp" &
         pid_list="$pid_list $!"
 
-        echo "Generating end map [textured]..."
+    echo "Generating end map [textured]..."
         "$unmined_dir/unmined-cli" web render \
                 --players \
                 --world="$backup_fullpath/worlds/$mc_world_name" \
@@ -222,7 +228,9 @@ generate_maps () {
                 -c \
                 --log-level="warning" \
                 --imageformat="webp" \
-                --bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
+				--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
+		        --java-client-jar="$unmined_dir/custom/client.jar" \
+		        --blockrender=true \
                 --chunkprocessors=8 &
         pid_list="$pid_list $!"
 
@@ -230,15 +238,15 @@ generate_maps () {
 	"$unmined_dir/unmined-cli" web render \
 		--world="$backup_fullpath/worlds/$mc_world_name" \
 		--output "$www_dir/nether_biome" \
-                --zoomout=4 \
+        --zoomout=4 \
 		--zoomin=5 \
 		--dimension nether \
 		--background="#000000" \
 		--log-level="warning" \
 		-c \
 		--imageformat="webp" \
-                --mapsettings "$unmined_dir/custom/biomes_only.json" \
-                2>&1 > /dev/null & # ignore errors, playerbuilt structures log errors since they're not from a biome
+        --mapsettings "$unmined_dir/custom/biomes_only.json" \
+        2>&1 > /dev/null & # ignore errors, playerbuilt structures log errors since they're not from a biome
         pid_list="$pid_list $!"
 
 	generate_index_html
@@ -246,6 +254,14 @@ generate_maps () {
 	echo "Waiting for map generation sub-processes to return..."
 	for pid in $pid_list; do
 		wait $pid || let "max_err=1"
+	done
+
+	# fix map perms due to unmined update workflow resetting perms
+	directories=("end_texture" "nether_biome" "nether_lower_texture" "nether_upper_texture" "overworld_biome" "overworld_texture")
+	for dir in "${directories[@]}"; do
+		echo "Fixing perms for $dir..."
+		chmod a+r $www_dir/$dir/*
+		chmod -R a+r $www_dir/$dir/lib/
 	done
 
 	if [ $max_err -eq 1 ]; then
