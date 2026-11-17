@@ -154,18 +154,18 @@ generate_maps () {
 		-c \
 		--imageformat="webp" \
 		--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
-        --java-client-jar="$unmined_dir/custom/client.jar" \
-        --blockrender=true \
+		--java-client-jar="$unmined_dir/custom/client.jar" \
+		--blockrender=true \
 		--chunkprocessors=32 \
 		--shadows="3d" &
 	pid_list="$pid_list $!"
 
 
 	echo "Generating overworld biome map..."
-        "$unmined_dir/unmined-cli" web render \
+	"$unmined_dir/unmined-cli" web render \
 		--world="$backup_fullpath/worlds/$mc_world_name" \
 		--output "$www_dir/overworld_biome" \
-                --zoomout=7 \
+		--zoomout=7 \
 		--zoomin=4 \
 		--dimension overworld \
 		--background="#000000" \
@@ -174,80 +174,80 @@ generate_maps () {
 		--imageformat="webp" \
 		--mapsettings "$unmined_dir/custom/biomes_only.json" \
 		2>&1 > /dev/null & # ignore errors, playerbuilt structures log errors since they're not from a biome
-        pid_list="$pid_list $!"
+	pid_list="$pid_list $!"
 
 	echo "Generating nether map [upper slice texture]..."
-        "$unmined_dir/unmined-cli" web render \
-                --players \
-                --world="$backup_fullpath/worlds/$mc_world_name" \
-                --output="$www_dir/nether_upper_texture" \
-                --zoomout=4 \
-                --zoomin=5 \
-                --dimension nether \
-                --background="#000000" \
-                --topY 126 \
-                --gndxray="true" \
-                --log-level="warning" \
-                -c \
-				--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
-		        --java-client-jar="$unmined_dir/custom/client.jar" \
-		        --blockrender=true \
-                --chunkprocessors=8 \
-                --imageformat="webp" &
-        pid_list="$pid_list $!"
+	"$unmined_dir/unmined-cli" web render \
+		--players \
+		--world="$backup_fullpath/worlds/$mc_world_name" \
+		--output="$www_dir/nether_upper_texture" \
+		--zoomout=4 \
+		--zoomin=5 \
+		--dimension nether \
+		--background="#000000" \
+		--topY 126 \
+		--gndxray="true" \
+		--log-level="warning" \
+		-c \
+		--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
+		--java-client-jar="$unmined_dir/custom/client.jar" \
+		--blockrender=true \
+		--chunkprocessors=8 \
+		--imageformat="webp" &
+	pid_list="$pid_list $!"
 
 	echo "Generating nether map [lower slice texture]..."
-        "$unmined_dir/unmined-cli" web render \
-                --players \
-                --world="$backup_fullpath/worlds/$mc_world_name" \
-                --output="$www_dir/nether_lower_texture" \
-                --zoomout=4 \
-                --zoomin=5 \
-                --dimension nether \
-                --background="#000000" \
-                --topY 70 \
-                --gndxray="true" \
-                --log-level="warning" \
-                -c \
-				--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
-		        --java-client-jar="$unmined_dir/custom/client.jar" \
-		        --blockrender=true \
-                --chunkprocessors=8 \
-                --imageformat="webp" &
-        pid_list="$pid_list $!"
+	"$unmined_dir/unmined-cli" web render \
+		--players \
+		--world="$backup_fullpath/worlds/$mc_world_name" \
+		--output="$www_dir/nether_lower_texture" \
+		--zoomout=4 \
+		--zoomin=5 \
+		--dimension nether \
+		--background="#000000" \
+		--topY 70 \
+		--gndxray="true" \
+		--log-level="warning" \
+		-c \
+		--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
+		--java-client-jar="$unmined_dir/custom/client.jar" \
+		--blockrender=true \
+		--chunkprocessors=8 \
+		--imageformat="webp" &
+	pid_list="$pid_list $!"
 
-    echo "Generating end map [textured]..."
-        "$unmined_dir/unmined-cli" web render \
-                --players \
-                --world="$backup_fullpath/worlds/$mc_world_name" \
-                --output="$www_dir/end_texture" \
-                --zoomout=4 \
-                --zoomin=5 \
-                --dimension end \
-                --background="#000000" \
-                -c \
-                --log-level="warning" \
-                --imageformat="webp" \
-				--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
-		        --java-client-jar="$unmined_dir/custom/client.jar" \
-		        --blockrender=true \
-                --chunkprocessors=8 &
-        pid_list="$pid_list $!"
+	echo "Generating end map [textured]..."
+	"$unmined_dir/unmined-cli" web render \
+		--players \
+		--world="$backup_fullpath/worlds/$mc_world_name" \
+		--output="$www_dir/end_texture" \
+		--zoomout=4 \
+		--zoomin=5 \
+		--dimension end \
+		--background="#000000" \
+		-c \
+		--log-level="warning" \
+		--imageformat="webp" \
+		--bedrock-vanilla-pack="$unmined_dir/custom/bedrock-samples-v1.26.40.05-full.zip" \
+		--java-client-jar="$unmined_dir/custom/client.jar" \
+		--blockrender=true \
+		--chunkprocessors=8 &
+	pid_list="$pid_list $!"
 
 	echo "Generating nether biome map..."
 	"$unmined_dir/unmined-cli" web render \
 		--world="$backup_fullpath/worlds/$mc_world_name" \
 		--output "$www_dir/nether_biome" \
-        --zoomout=4 \
+		--zoomout=4 \
 		--zoomin=5 \
 		--dimension nether \
 		--background="#000000" \
 		--log-level="warning" \
 		-c \
 		--imageformat="webp" \
-        --mapsettings "$unmined_dir/custom/biomes_only.json" \
-        2>&1 > /dev/null & # ignore errors, playerbuilt structures log errors since they're not from a biome
-        pid_list="$pid_list $!"
+		--mapsettings "$unmined_dir/custom/biomes_only.json" \
+		2>&1 > /dev/null & # ignore errors, playerbuilt structures log errors since they're not from a biome
+	pid_list="$pid_list $!"
 
 	generate_index_html
 
@@ -286,7 +286,7 @@ get_running_status () {
 		echo "Running Minecraft server found at pid $mc_pid"
 		check_player_count
 		return 1
-        fi
+	fi
 }
 
 abort_with_err_if_running () {
@@ -361,9 +361,9 @@ if [ $1 = "fast-backup" ]; then
 fi
 
 if [ $1 = "export" ]; then
-        mc_generate_maps="false"
-        stop_running_server
-        backup_offline
+	mc_generate_maps="false"
+	stop_running_server
+	backup_offline
 
 	#export_and_lock
 	exit 0
